@@ -1,5 +1,5 @@
 import sys
-from turtle import distance
+from turtle import distance, width
 import pygame
 import time
 import random
@@ -16,6 +16,7 @@ window_y = 480
 dark_gray = pygame.Color(18, 18, 18)
 white = pygame.Color(255, 255, 255)
 orange = pygame.Color(255, 150, 113)
+red = pygame.Color(255, 0, 0)
 
 pygame.init()
 
@@ -33,10 +34,6 @@ snake_body = [[100,50],[90,50],[80,50],[70,50]]
 food_position = [random.randrange(1, (window_x//10)) * 10, random.randrange(1, (window_y//10)) * 10]
 food_spawn = True
 
-# Snake direction
-direction = 'RIGHT'
-change_to = direction
-
 # Available Moves
 moves = [[0,-10], #UP
         [0,10],  #DOWN
@@ -46,50 +43,28 @@ moves = [[0,-10], #UP
 # Main function
 while True:
 
-    # # Detect actions
-    # for event in pygame.event.get():
-    #     if event.type == pygame.QUIT:
-    #         pygame.quit()
-    #         sys.exit()
-
-    #     if event.type == pygame.KEYDOWN:
-    #         if event.key == pygame.K_UP:
-    #             change_to = 'UP'
-    #         if event.key == pygame.K_DOWN:
-    #             change_to = 'DOWN'
-    #         if event.key == pygame.K_LEFT:
-    #             change_to = 'LEFT'
-    #         if event.key == pygame.K_RIGHT:
-    #             change_to = 'RIGHT'
-
-    # if change_to == 'UP' and direction != 'DOWN':
-    #     direction = 'UP'
-    # if change_to == 'DOWN' and direction != 'UP':
-    #     direction = 'DOWN'
-    # if change_to == 'LEFT' and direction != 'RIGHT':
-    #     direction = 'LEFT'
-    # if change_to == 'RIGHT' and direction != 'LEFT':
-    #     direction = 'RIGHT'
-
-    #  # Snake movement
-    # if shortest_path == 'UP':
-    #     snake_position[1] -= 10
-    # if shortest_path == 'DOWN':
-    #     snake_position[1] += 10
-    # if shortest_path == 'LEFT':
-    #     snake_position[0] -= 10
-    # if shortest_path == 'RIGHT':
-    #     snake_position[0] += 10
+    # Detect actions
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
 
     # AI Euclidean Pathfinding
     shortest_path = moves[0]
     shortest_dir = dist(list(map(add, snake_position, moves[0])), food_position)
 
     for i in range(1,len(moves)):
-        distance = dist(list(map(add, snake_position, moves[i])), food_position)
-        if distance < shortest_dir:
-            shortest_path = moves[i]
-            shortest_dir = distance
+        check = list(map(add, snake_position, moves[i]))
+        valid = True
+        for block in snake_body[1:]:
+            if check == block:
+                valid = False
+                break
+        if valid:
+            distance = dist(check, food_position)
+            if distance < shortest_dir:
+                shortest_path = moves[i]
+                shortest_dir = distance
 
     snake_position = list(map(add, snake_position, shortest_path))
 
